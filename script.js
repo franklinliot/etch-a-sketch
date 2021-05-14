@@ -1,37 +1,53 @@
-//query selectors
-const container = document.querySelector('#container');
+const gridContainer = document.querySelector("#grid-container");
+const resetButton = document.querySelector("#reset-button");
 
-//Function that creates GRID
-function addDivs(rows, cols){
-    container.style.setProperty('--grid-rows', rows);
-    container.style.setProperty('--grid-cols', cols);
-    for (i = 0; i < (rows * cols); i++){
-      let square = document.createElement("div");
-      square.classList.add('grid-item');
-      container.appendChild(square);
-    }
-  hoverColor();
+window.addEventListener("load", setDefaultGrid);
+resetButton.addEventListener("click", changeSize);
+
+function setDefaultGrid() {
+  setGridSize(16);
+  fillGrid(16);
 }
 
-//function that creates a random color
-let randomColor = function() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+function setGridSize(size) {
+  gridContainer.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
 }
 
-//function that changes div color uponed being hovered
-function hoverColor() {
-  let items = document.querySelectorAll('.grid-item');
-  items.forEach(item => {
-    item.addEventListener('mouseover', () => {
-      item.style.backgroundColor = `${randomColor()}`;
-    });
+function fillGrid(size) {
+  for (let i = 0; i < size * size; i++) {
+    const gridElement = document.createElement("div");
+    gridElement.classList = "grid-element";
+    gridElement.addEventListener("mouseover", changeColor);
+    gridContainer.appendChild(gridElement);
+  }
+}
+
+function changeColor(e) {
+  const randomR = Math.floor(Math.random() * 256);
+  const randomG = Math.floor(Math.random() * 256);
+  const randomB = Math.floor(Math.random() * 256);
+  e.target.style.backgroundColor = `rgb(${randomR}, ${randomG}, ${randomB})`;
+}
+
+function changeSize() {
+  let newSize = prompt("Enter new size");
+
+  if (newSize !== null) {
+    newSize = parseInt(newSize);
+    if (newSize < 1 || newSize > 64 || Number.isNaN(newSize)) {
+      alert("Enter a number from 1-64 range");
+      changeSize();
+    } else {
+      clearGrid();
+      setGridSize(newSize);
+      fillGrid(newSize);
+    }
+  }
+}
+
+function clearGrid() {
+  const gridArray = Array.from(gridContainer.childNodes);
+  gridArray.forEach((element) => {
+    gridContainer.removeChild(element);
   });
 }
-
-//grid creation
-addDivs(16, 16);
